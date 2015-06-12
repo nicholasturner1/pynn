@@ -15,5 +15,5 @@ Some of the scripts within this package depend on cython optimizations. These ne
 compiled on your host machine before they can be imported properly. This can be achieved
 by:
 
-cd pynn
-python setup.py build_ext --inplace
+    cd pynn
+    python setup.py build_ext --inplace
