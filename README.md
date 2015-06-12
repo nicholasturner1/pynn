@@ -17,3 +17,10 @@ by:
 
     cd pynn
     python setup.py build_ext --inplace
+
+# Contact
+
+* Nicholas Turner \<nturner@princeton.edu\>
+* Jingpeng Wu \<jingpeng@princeton.edu\>
+
+
