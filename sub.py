@@ -67,7 +67,7 @@ def main(net_out_fname, comp_fname, outname='sub',
 
 	print "Total Error: %f" % (sub.sum())
 
-	io.znn_img_save(sub, "sub")
+	io.znn_img_save(sub, outname)
 
 if __name__ == '__main__':
 
