@@ -1,11 +1,41 @@
 #!/usr/bin/env python
+__doc__ = '''
+Subtraction Error Between ZNN Volumes
 
-documentation = '''
-Subtraction Calculation
+ This module computes the subtraction of
+two ZNN volumes, where the comparison volume is subtracted
+ from the network output. It also saves a volume which 
+indicates the spatial location of each difference.
+
+If the volumes are of different sizes, then the comparison volume
+is cropped to match the dimensions of the network output. Thus, if
+comparing two different network output files, the comparison file
+should be the larger volume. Cropping takes evenly from both sides,
+in line with the loss of resolution common with convolutional nets.
+
+
+Inputs:
+
+	-Network Output Filename
+	-Comparison Filename
+	-Desired Output Name (opt)
+	-Whether the comparison file is a label file (opt) (flag)
+	-Whether to normalize the comparison volume (opt) (flag)
+	  (this can be useful for direct comparison to images)
+
+Main Outputs:
+
+	-New ZNN dataset containing the subtraction error
+	 differences between the network output and the
+	 comparison volume.
+
+
+Nicholas Turner, June 2015
 '''
 
 import argparse
 import numpy as np 
+
 from emirt import io 
 from vol_utils import crop, norm
 
@@ -41,7 +71,9 @@ def main(net_out_fname, comp_fname, outname='sub',
 
 if __name__ == '__main__':
 
-	parser = argparse.ArgumentParser(description=documentation)
+	parser = argparse.ArgumentParser(
+		description=__doc__,
+		formatter_class=argparse.RawDescriptionHelpFormatter)
 
 	parser.add_argument('net_output_filename',
 		help= "Network output file for which you'd like the error")
