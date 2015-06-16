@@ -55,10 +55,14 @@ class CompareVol:
 
     def __norm(self, imslice):
         #subtract the nonzero minimum from each slice
-        nonzero_min = np.min(imslice[np.nonzero(imslice)])
+        nonzero_indices = np.nonzero(imslice)
+        if len(nonzero_indices) > 0 and np.max(imslice) > 1:
+            nonzero_min = np.min(imslice[np.nonzero(imslice)])
 
-        res = np.copy(imslice)
-        res[np.nonzero(res)] = res[np.nonzero(res)] - nonzero_min + 1
+            res = np.copy(imslice)
+            res[np.nonzero(res)] = res[np.nonzero(res)] - nonzero_min + 1
+        else: 
+            res = imslice
         return res
 
     def __show_slice(self):

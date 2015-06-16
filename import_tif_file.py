@@ -1,17 +1,68 @@
 #!/usr/bin/env python
+__doc__ = '''
+ZNN data import from tif files
 
+ This module imports a pair of tif files into dataset directories
+ within the ZNN hierarchy. 
+
+ The created  directories are specified by means of relative pathnames, 
+ so the current directory determines their final location. While one could
+ run this from any such current directory, it is intended to run from the
+ ZNN installation directory for standard organization.
+
+Inputs:
+
+	-Image Filename
+	-Label Filename
+	-Desired Dataset Name (opt)
+	-Whether to remove the mean from the image at this step (opt) (flag)
+	 NOTE: You can also perform standard normalization 
+	       through ZNN preprocessing
+	-What percentage of the dataset to use as a test set (opt) (flag)
+	  
+	
+Main Outputs:
+
+	-A ZNN dataset directory populated with:
+		-batch1.image, batch2.image - image 
+		-batch1.label ()
+
+
+Nicholas Turner, June 2015
+'''
 documentation ='''
 Quick ZNN data import from tif files
 
 SHOULD BE RUN FROM THE ZNN DIRECTORY
 '''
 
+#Standard imports
+import os, math, argparse
+#Not so standard imports
 import tifffile
 import emirt
-import os, math
-import argparse
-from sys import argv
 import numpy as np
+
+########################################
+#Constants
+
+spec_file_format_string = """[INPUT1]
+path=./dataset/{0}/data/batch{1}
+ext=image
+size={2},{3},{4}
+pptype=standard2D
+
+[LABEL1]
+path=./dataset/{0}/data/batch{1}
+ext=label
+size={2},{3},{4}
+pptype=binary_class
+
+[MASK1]
+size={2},{3},{4}
+pptype=one
+ppargs=2"""
+########################################
 
 def rgb2bin(vol):
 	'''Transforms a 4d numpy array to a binary 3d array'''
@@ -57,23 +108,14 @@ def write_spec_file(dname, batch_num, size):
 	spec_fname = "dataset/{0}/spec/batch{1}.spec".format(dname,
 														batch_num)
 	f = open( spec_fname, 'w')
-	#I know, this is ugly as hell
-	f.write( """[INPUT1]
-path=./dataset/{0}/data/batch{1}
-ext=image
-size={2},{3},{4}
-pptype=standard2D
 
-[LABEL1]
-path=./dataset/{0}/data/batch{1}
-ext=label
-size={2},{3},{4}
-pptype=binary_class
-
-[MASK1]
-size={2},{3},{4}
-pptype=one
-ppargs=2""".format(dname, batch_num, size[2], size[1], size[0]) )
+	f.write(spec_file_format_string.format(
+				dname, 
+				batch_num, 
+				size[2], 
+				size[1], 
+				size[0]) )
+	
 	f.close()
 
 def main(vol_fname='', label_fname='', dataset_name='', percent_test=0,
@@ -135,7 +177,9 @@ def main(vol_fname='', label_fname='', dataset_name='', percent_test=0,
 
 if __name__ == '__main__':
 
-	parser = argparse.ArgumentParser(description = documentation)
+	parser = argparse.ArgumentParser(
+		description=__doc__,
+		formatter_class=argparse.RawDescriptionHelpFormatter)
 
 	parser.add_argument('vol_fname', help='input volume filename')
 	parser.add_argument('label_fname', help='label volume filename')

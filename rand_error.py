@@ -1,15 +1,31 @@
 #!/usr/bin/env python
+__doc__ = '''
+2D Rand Error Between ZNN Volumes
 
-documentation = '''
-Calculation of rand error by connected components
+ This module computes the 2D Rand Error between
+two ZNN volumes. It also saves a volume for each of the inputs,
+which contains the connected components found by 4-connectivity analysis.
+
+Inputs:
+
+	-Network Output Filename
+	-Label Filename
+	-Threshold for the network output
+	-Whether to save connected component volumes (opt) (flag)
+	
+Main Outputs:
+
+	-Reports rand error via a print
+	-Saves connected component volumes to disk
+
+Nicholas Turner, Jingpeng Wu June 2015
 '''
 
 import timeit
 import argparse
 import numpy as np
 from emirt import io
-import c_relabel
-from rand_error_f import overlap_matrix
+from cynn import relabel, overlap_matrix
 from os import path
 
 def threshold_volume(vol, threshold):
@@ -50,13 +66,13 @@ def main(vol_fname, label_fname, threshold=0.5, save=False):
 
 	print "Labelling connected components in volume..."
 	start = timeit.default_timer()
-	vol_cc = c_relabel.relabel1N(vol)
+	vol_cc = relabel.relabel1N(vol)
 	end = timeit.default_timer()
 	print "Labelling completed in %f seconds" % (end-start)
 	print
 	print "Labelling connected components in labels..."
 	start = timeit.default_timer()
-	label_cc = c_relabel.relabel1N(label.astype('uint32'))
+	label_cc = relabel.relabel1N(label.astype('uint32'))
 	end = timeit.default_timer()
 	print "Labelling completed in %f seconds" % (end-start)
 
@@ -68,7 +84,7 @@ def main(vol_fname, label_fname, threshold=0.5, save=False):
 	print
 	print "Finding overlap matrix..."
 	start = timeit.default_timer()
-	om = overlap_matrix(vol_cc, label_cc)
+	om = overlap_matrix.overlap_matrix(vol_cc, label_cc)
 	end = timeit.default_timer()
 	print "Matrix Calculated in %f seconds" % (end-start)
 
@@ -82,7 +98,9 @@ def main(vol_fname, label_fname, threshold=0.5, save=False):
 
 if __name__ == '__main__':
 
-	parser = argparse.ArgumentParser(description = documentation)
+	parser = argparse.ArgumentParser(
+		description=__doc__,
+		formatter_class=argparse.RawDescriptionHelpFormatter)
 
 	parser.add_argument('output_filename', 
 		help="Filename of the output image")
